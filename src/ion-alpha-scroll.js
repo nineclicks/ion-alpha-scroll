@@ -80,19 +80,24 @@ angular.module('ion-alpha-scroll', [])
                             scope.locateAlphabet();
                             var mouseY = $scope.gesture.touches[0].clientY;
                             var i = Math.floor((mouseY - scope.letterTop) / scope.letterHeight * (scope.letterCount - 1) + 0.25);
-                            if (i < 0) {
-                                i = 0;
+                            if (i < -1) {
+                                i = -1;
                             } else if (i > scope.letters.length - 1) {
                                 i = scope.letters.length - 1;
                             }
 							while (!scope.sorted_items.hasOwnProperty(scope.letters[i]) && i > -1) {
 								i--;
 							}
-                            var selected = scope.letters[i];
+                            if (i == -1) {
+                                selected = "0";
+                            } else {
+                                var selected = scope.letters[i];
+                            }
                             if (selected !== scope.lastLetter) {
                                 scope.lastLetter = selected;
                                 scope.alphaScrollGoToList(selected);
                             }
+                            console.log(i);
                         }
                         scope.letters = false;
                         scope.lastLetter = "";
