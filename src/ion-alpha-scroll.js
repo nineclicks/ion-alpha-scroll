@@ -16,7 +16,7 @@ angular.module('ion-alpha-scroll', [])
                     '<ion-item ng-repeat="item in items"></ion-item>',
                     '</div>',
                     '</ion-scroll>',
-                    '<ul class="ion_alpha_sidebar" on-tap="dragScroll($event)" on-drag="dragScroll($event)">',
+                    '<ul class="ion_alpha_sidebar" on-touch="locateAlphabet()" on-tap="dragScroll($event)" on-drag="dragScroll($event)">',
                     '<li ng-repeat="letter in alphabet | orderBy: letter">{{ letter }}</li>',
                     '</ul>',
                     '</ion-list>'
@@ -77,7 +77,6 @@ angular.module('ion-alpha-scroll', [])
                         }
 
                         scope.dragScroll = function($scope) {
-                            scope.locateAlphabet();
                             var mouseY = $scope.gesture.touches[0].clientY;
                             var i = Math.floor((mouseY - scope.letterTop) / scope.letterHeight * (scope.letterCount - 1) + 0.25);
                             if (i < -1) {
@@ -122,9 +121,6 @@ angular.module('ion-alpha-scroll', [])
                         }
 
                         scope.locateAlphabet = function(){
-                            if (scope.letters !== false) {
-                                return;
-                            }
                             scope.letters = [];
                             var sideBar = document.getElementsByClassName('ion_alpha_sidebar disable-user-behavior')[0];
                             var letters = sideBar.getElementsByTagName("li");
