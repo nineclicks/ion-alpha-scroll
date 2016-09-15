@@ -64,13 +64,15 @@ angular.module('ion-alpha-scroll', [])
                             }
                             tmp[letter].push(scope.items[i]);
                         }
+						delete tmp.A;
                         scope.alphabet = iterateAlphabet(tmp);
                         scope.sorted_items = tmp;
 
                         scope.alphaScrollGoToList = function(letter) {
-                            //var id = 'index_' + $scope.target.attributes['ng-data-value'].value;
+							if (!scope.sorted_items.hasOwnProperty(letter)) {
+								return;
+							}
                             var id = 'index_' + letter;
-                            //$ionicScrollDelegate.getScrollView().__enableScrollY = false;
                             $location.hash(id);
                             $ionicScrollDelegate.$getByHandle('alphaScroll').anchorScroll();
                         }
@@ -84,6 +86,9 @@ angular.module('ion-alpha-scroll', [])
                             } else if (i > scope.letters.length - 1) {
                                 i = scope.letters.length - 1;
                             }
+							while (!scope.sorted_items.hasOwnProperty(scope.letters[i]) && i > -1) {
+								i--;
+							}
                             var selected = scope.letters[i];
                             if (selected !== scope.lastLetter) {
                                 scope.lastLetter = selected;
@@ -96,12 +101,14 @@ angular.module('ion-alpha-scroll', [])
                         //Create alphabet object
                         function iterateAlphabet(alphabet) {
                             var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+/*
                             if (Object.keys(alphabet).length != 0) {
                                 str = '';
                                 for (var i = 0; i < Object.keys(alphabet).length; i++) {
                                     str += Object.keys(alphabet)[i];
                                 }
                             }
+*/
                             var numbers = new Array();
                             for (var i = 0; i < str.length; i++) {
                                 var nextChar = str.charAt(i);
