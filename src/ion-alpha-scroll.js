@@ -96,7 +96,6 @@ angular.module('ion-alpha-scroll', [])
                                 scope.lastLetter = selected;
                                 scope.alphaScrollGoToList(selected);
                             }
-                            console.log(i);
                         }
                         scope.letters = false;
                         scope.lastLetter = "";
@@ -128,7 +127,6 @@ angular.module('ion-alpha-scroll', [])
                             scope.letterHeight = letters[letters.length-1].offsetTop - scope.letterTop;
                             scope.letterTop += letters[0].offsetParent.offsetTop;
                             scope.letterCount = letters.length;
-                            console.log(scope.letterTop);
 
                             for (var i = 0; i < letters.length; i++) {
                                 var letter = letters[i].innerHTML.trim();
