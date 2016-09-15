@@ -64,7 +64,6 @@ angular.module('ion-alpha-scroll', [])
                             }
                             tmp[letter].push(scope.items[i]);
                         }
-						delete tmp.A;
                         scope.alphabet = iterateAlphabet(tmp);
                         scope.sorted_items = tmp;
 
