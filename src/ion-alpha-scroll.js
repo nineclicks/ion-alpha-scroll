@@ -8,7 +8,7 @@ angular.module('ion-alpha-scroll', [])
             replace: true,
             compile: function(tElement, tAttrs, tTransclude) {
                 var children = tElement.contents();
-                var template = angular.element([
+                var templateElements = [
                     '<ion-list class="ion_alpha_list_outer">',
                     '<ion-scroll delegate-handle="alphaScroll">',
                     '<div data-ng-repeat="(letter, items) in sorted_items" class="ion_alpha_list">',
@@ -16,11 +16,18 @@ angular.module('ion-alpha-scroll', [])
                     '<ion-item ng-repeat="item in items"></ion-item>',
                     '</div>',
                     '</ion-scroll>',
-                    '<ul class="ion_alpha_sidebar">',
-                    '<li ng-click="alphaScrollGoToList(\'index_{{letter}}\')" ng-repeat="letter in alphabet | orderBy: letter">{{ letter }}</li>',
+                    '<ul class="ion_alpha_sidebar" on-tap="dragScroll($event)" on-drag="dragScroll($event)">',
+                    '<li ng-repeat="letter in alphabet | orderBy: letter">{{ letter }}</li>',
                     '</ul>',
                     '</ion-list>'
-                ].join(''));
+                ];
+				
+				var refresher = angular.fromJson(tAttrs.refresher);
+			    if (refresher) {
+					var refresherElement = '<ion-refresher pulling-text="' + refresher.text + '" on-refresh="' + refresher.callback + '"> </ion-refresher>';
+					templateElements.splice(2, 0, refresherElement);
+			    }
+			    var template = angular.element(templateElements.join(''));
 
                 var headerHeight = $document[0].body.querySelector('.bar-header').offsetHeight;
                 var subHeaderHeight = tAttrs.subheader === "true" ? 44 : 0;
@@ -60,10 +67,31 @@ angular.module('ion-alpha-scroll', [])
                         scope.alphabet = iterateAlphabet(tmp);
                         scope.sorted_items = tmp;
 
-                        scope.alphaScrollGoToList = function(id) {
+                        scope.alphaScrollGoToList = function(letter) {
+                            //var id = 'index_' + $scope.target.attributes['ng-data-value'].value;
+                            var id = 'index_' + letter;
+                            //$ionicScrollDelegate.getScrollView().__enableScrollY = false;
                             $location.hash(id);
                             $ionicScrollDelegate.$getByHandle('alphaScroll').anchorScroll();
                         }
+
+                        scope.dragScroll = function($scope) {
+                            scope.locateAlphabet();
+                            var mouseY = $scope.gesture.touches[0].clientY;
+                            var i = Math.floor((mouseY - scope.letterTop) / scope.letterHeight * (scope.letterCount - 1) + 0.25);
+                            if (i < 0) {
+                                i = 0;
+                            } else if (i > scope.letters.length - 1) {
+                                i = scope.letters.length - 1;
+                            }
+                            var selected = scope.letters[i];
+                            if (selected !== scope.lastLetter) {
+                                scope.lastLetter = selected;
+                                scope.alphaScrollGoToList(selected);
+                            }
+                        }
+                        scope.letters = false;
+                        scope.lastLetter = "";
 
                         //Create alphabet object
                         function iterateAlphabet(alphabet) {
@@ -80,6 +108,25 @@ angular.module('ion-alpha-scroll', [])
                                 numbers.push(nextChar);
                             }
                             return numbers;
+                        }
+
+                        scope.locateAlphabet = function(){
+                            if (scope.letters !== false) {
+                                return;
+                            }
+                            scope.letters = [];
+                            var sideBar = document.getElementsByClassName('ion_alpha_sidebar disable-user-behavior')[0];
+                            var letters = sideBar.getElementsByTagName("li");
+                            scope.letterTop = letters[0].offsetTop;
+                            scope.letterHeight = letters[letters.length-1].offsetTop - scope.letterTop;
+                            scope.letterTop += letters[0].offsetParent.offsetTop;
+                            scope.letterCount = letters.length;
+                            console.log(scope.letterTop);
+
+                            for (var i = 0; i < letters.length; i++) {
+                                var letter = letters[i].innerHTML.trim();
+                                scope.letters.push(letter);
+                            }
                         }
 
                     };
